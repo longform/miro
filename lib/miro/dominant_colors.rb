@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 module Miro
   class DominantColors
     attr_accessor :src_image_path
@@ -52,9 +54,7 @@ module Miro
     def open_source_image
       return File.open(@src_image_path) unless remote_source_image?
 
-      original_extension = @image_type || URI.parse(@src_image_path).path.split('.').last
-
-      tempfile = Tempfile.open(["source", ".#{original_extension}"])
+      tempfile = Tempfile.open(Digest::SHA1.hexdigest @src_image_path)
       remote_file_data = open(@src_image_path).read
 
       tempfile.write(should_force_encoding? ? remote_file_data.force_encoding("UTF-8") : remote_file_data)
